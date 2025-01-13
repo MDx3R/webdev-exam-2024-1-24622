@@ -1,9 +1,15 @@
 import {
     listProducts,
-    getProduct
+    retrieveProduct,
+    listOrders,
+    retrieveOrder,
+    postOrder, 
+    putOrder, 
+    deleteOrder,
 } from "./api.js";
 import {
-    Product
+    Product,
+    Order
 } from "./models.js";
 
 class ProductRepository {
@@ -20,10 +26,14 @@ class ProductRepository {
         this.cart = this.getProductsFromCart();
     }
 
+    async getProduct(id) {
+        return new Product(await retrieveProduct(id));
+    }
+
     async loadCart() {
         this.cart = this.getProductsFromCart();
         for (let id of this.cart) {
-            this.products.push(new Product(await getProduct(id)));
+            this.products.push(new Product(await retrieveProduct(id)));
         }
     }
 
@@ -38,7 +48,7 @@ class ProductRepository {
         if (key == "rating_asc" || key == "rating_desc") {
             return product.rating;
         } else if (key == "price_asc" || key == "price_desc") {
-            return product.discount_price ?? product.actual_price;
+            return product.getPrice();
         } else {
             return product.id;
         }
@@ -54,18 +64,31 @@ class ProductRepository {
         });
     }
 
-    addToCart(product) {
-        this.cart.push(product.id);
+    _setCart() {
         localStorage.setItem("cart", JSON.stringify(this.cart));
     }
 
+    addToCart(product) {
+        this.cart.push(product.id);
+        this._setCart();
+    }
+
     removeFromCart(product) {
-        localStorage.setItem(
-            "cart", 
-            JSON.stringify(
-                this.getProductsFromCart().filter(a => a != product.id)
-            )
-        );
+        this.cart = this.cart.filter(a => a != product.id);
+        this._setCart();
+    }
+
+    clearCart() {
+        this.cart = [];
+        this._setCart();
+    }
+
+    removeFromProducts(product) {
+        this.products = this.products.filter(a => a != product);
+    }
+
+    clearProducts() {
+        this.products = [];
     }
 
     filterProducts() {
@@ -73,6 +96,35 @@ class ProductRepository {
     }
 }
 
+class OrderRepository {
+    constructor() {
+        this.orders = [];
+    }
+
+    async getOrders() {
+        for (let elem of await listOrders()) {
+            this.orders.push(new Order(elem));
+        }
+    }
+
+    async getOrder(id) {
+        return new Order(await retrieveOrder(id));
+    }
+
+    async createOrder(data) {
+        return new Order(await postOrder(data));
+    }
+
+    async updateOrder(order) {
+        return new Order(await putOrder(order));
+    }
+
+    async removeOrder(id) {
+        return new Order(await deleteOrder(id));
+    }
+}
+
 export {
     ProductRepository,
+    OrderRepository,
 };
