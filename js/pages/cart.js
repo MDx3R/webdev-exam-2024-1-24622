@@ -31,8 +31,7 @@ const cartController = new CartController(
     notificationView
 );
 
-orderController.cartController = cartController;
-console.log(orderController.cartController);
+checkoutController.cartController = cartController;
 
 await cartController.init();
-orderController.init();
+checkoutController.init();
