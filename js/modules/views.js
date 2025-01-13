@@ -1,4 +1,3 @@
-
 class NotificationView {
     constructor() {
         this.notificationContainer = document.getElementById('notification');
@@ -38,7 +37,6 @@ class ProductView {
 
     renderProducts(products, cart = []) {
         this.productsContainer.innerHTML = '';
-
         products.forEach(element => {
             this.productsContainer.append(
                 this._buildProductCard(
@@ -66,6 +64,14 @@ class ProductView {
         }
 
         card.classList.toggle("chosen");
+    }
+
+    removeProduct(product) {
+        product.container.remove();
+    }
+
+    removeProducts() {
+        this.productsContainer.innerHTML = '';
     }
 
     _buildProductCard(product) {
@@ -149,9 +155,7 @@ class ProductView {
         return column;
     }
 
-    bindFilter(handler) {
-
-    }
+    bindFilter(handler) {}
 
     bindSort(handler) {
         this.sortSelect.addEventListener(
@@ -168,7 +172,108 @@ class ProductView {
     }
 }
 
+class CartView extends ProductView {
+    toggleProduct(product) {
+        let card = product.container.firstChild;
+
+        let remove_button = card.querySelector(".remove-from-cart-btn");
+        let add_button = card.querySelector(".add-to-cart-btn");
+
+        if (remove_button.hidden == false) {
+            remove_button.hidden = true;
+            add_button.hidden = false;
+        } else {
+            remove_button.hidden = false;
+            add_button.hidden = true;
+        }
+    }
+}
+
+class CheckoutView {
+    constructor() {
+        this.orderContainer = document.getElementById('orders');
+        this.orderCreateForm = document.getElementById('order-create-form');
+        this.createOrderButton = document.getElementById('create-order');
+        this.dateSelect = document.getElementById('delivery_date');
+        this.timeSelect = document.getElementById('delivery_interval');
+
+        this.goodsCostText = document.getElementById('goods-cost');
+        this.deliveryCostText = document.getElementById('delivery-cost');
+        this.finalCostText = document.getElementById('final-cost');
+    }
+
+    renderCheckout(products) {
+        function costBuilder(text, value) {
+            return `${text} <strong>${value}&#8381;</strong>`;
+        }
+
+        let delivery_cost = this.calculateDeliveryCost(
+            this.orderCreateForm.delivery_date.value,
+            this.orderCreateForm.delivery_interval.value.split('-')[0]
+        );
+        let goodsCost = products.reduce(
+            (sum, current) => sum + current.getPrice(), 0
+        );
+        this.goodsCostText.innerHTML 
+            = costBuilder("Стоимость товаров:", goodsCost);
+        this.deliveryCostText.innerHTML 
+            = costBuilder("Доставка:", delivery_cost);
+        this.finalCostText.innerHTML = 
+            costBuilder("Итоговая стоимость:", goodsCost + delivery_cost);
+    }
+
+    clearCheckout() {
+        this.orderCreateForm.reset();
+    }
+
+    calculateDeliveryCost(date, time) {
+        let cost = 200;
+
+        if (!(date && time)) return cost;
+
+        date = new Date(date + " " + time);
+
+        let dayOfWeek = date.getDay();
+        let hour = date.getHours();
+
+        let isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      
+        if (isWeekend) {
+            cost += 300;
+        } else if (hour >= 18) {
+            cost += 200;
+        }
+        return cost;
+    }
+
+    bindCreateOrder(handler) {
+        this.createOrderButton.addEventListener(
+            "click", 
+            event => {
+                handler(new FormData(this.orderCreateForm));
+                event.preventDefault();
+            }
+        );
+    }
+
+    bindChangeDate(handler) {
+        this.dateSelect.addEventListener(
+            "change",
+            handler
+        );
+    }
+
+    bindChangeTime(handler) {
+        this.timeSelect.addEventListener(
+            "change",
+            handler
+        );
+    }
+}
+
 export {
     NotificationView,
     ProductView,
+    CartView,
+    CheckoutView,
 };
