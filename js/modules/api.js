@@ -19,7 +19,8 @@ const endpoints = {
 async function sendRequest(url, data = null) {
     let response = await fetch(url, data);
     if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
+        let json = await response.json();
+        throw new Error(`HTTP Error: ${json.error}`);
     }
 
     return await response.json();
@@ -31,14 +32,68 @@ async function listProducts() {
     return response;
 }
 
-async function getProduct(id) {
+async function retrieveProduct(id) {
     let response = await sendRequest(endpoints.products.retrive(id));
 
     return response;
 }
 
+async function listOrders() {
+    let response = await sendRequest(endpoints.orders.list());
+
+    return response;
+}
+
+async function retrieveOrder(id) {
+    let response = await sendRequest(endpoints.orders.retrive(id));
+
+    return response;
+}
+
+async function postOrder(data) {
+    let response = await sendRequest(
+        endpoints.orders.create(), 
+        {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: data,
+        }
+    );
+
+    return response;
+}
+
+async function putOrder(id, data) {
+    let response = await sendRequest(
+        endpoints.orders.update(id), 
+        {
+            method: "PUT",
+            body: data,
+        }
+    );
+
+    return response;
+}
+
+async function deleteOrder(id) {
+    let response = await sendRequest(
+        endpoints.orders.delete(id),
+        {
+            method: "DELETE",
+        }
+    );
+
+    return response;
+}
 
 export {
     listProducts,
-    getProduct,
+    retrieveProduct,
+    listOrders, 
+    retrieveOrder, 
+    postOrder, 
+    putOrder, 
+    deleteOrder,
 };
