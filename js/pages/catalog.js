@@ -17,3 +17,5 @@ const productController = new ProductController(
     productView, 
     notificationView
 );
+
+productController.init();
