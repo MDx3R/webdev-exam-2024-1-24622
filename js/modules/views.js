@@ -76,6 +76,10 @@ class ProductView {
         this.loadMoreButton.hidden = true;
     }
 
+    resetSortSelect() {
+        this.sortSelect.value = "";
+    }
+
     chooseProduct(product) {
         let card = product.container.firstChild;
         let remove_button = card.querySelector(".remove-from-cart-btn");

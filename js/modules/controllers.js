@@ -50,6 +50,7 @@ class ProductController {
             this.view.removeProducts();
         }
         try {
+            this.view.resetSortSelect();
             let start = await this.repository.getProductsByPage(page);
             this.view.addProducts(
                 this.repository.products.slice(start), 
@@ -63,13 +64,12 @@ class ProductController {
         } catch (err) {
             this.notification.showNotification(err.message, err.name);
         }
-            
     }
 
     handleSort(sortBy) {
         let sortedProducts = this.repository.sortProducts(sortBy);
         
-        this.view.renderProducts(sortedProducts);
+        this.view.renderProducts(sortedProducts, this.repository.cart);
     }
 
     handleFilter(filter) {}
