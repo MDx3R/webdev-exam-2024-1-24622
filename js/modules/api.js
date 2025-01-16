@@ -4,6 +4,9 @@ const apiKey = "e3e17790-c7e0-4eb3-ac85-aa40f4715bf2";
 const endpoints = {
     products: {
         list: () => `${apiUrl}/goods?api_key=${apiKey}`,
+        listByPage: (page, per_page) => 
+            `${apiUrl}/` 
+            + `goods?page=${page}&per_page=${per_page}&api_key=${apiKey}`,
         retrive: (id) => `${apiUrl}/goods/${id}?api_key=${apiKey}`,
     },
 
@@ -28,6 +31,14 @@ async function sendRequest(url, data = null) {
 
 async function listProducts() {
     let response = await sendRequest(endpoints.products.list());
+
+    return response;
+}
+
+async function listProductsByPage(page, per_page) {
+    let response = await sendRequest(
+        endpoints.products.listByPage(page, per_page)
+    );
 
     return response;
 }
@@ -69,6 +80,9 @@ async function putOrder(id, data) {
     let response = await sendRequest(
         endpoints.orders.update(id), 
         {
+            headers: {
+                "Content-Type": "application/json"
+            },
             method: "PUT",
             body: data,
         }
@@ -90,6 +104,7 @@ async function deleteOrder(id) {
 
 export {
     listProducts,
+    listProductsByPage,
     retrieveProduct,
     listOrders, 
     retrieveOrder, 
