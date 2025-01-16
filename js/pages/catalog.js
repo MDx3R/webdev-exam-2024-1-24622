@@ -18,4 +18,4 @@ const productController = new ProductController(
     notificationView
 );
 
-productController.init();
+productController.initByPage();
