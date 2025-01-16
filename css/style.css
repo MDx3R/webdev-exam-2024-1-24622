@@ -27,3 +27,39 @@ main {
     min-height: 15rem;
     max-height: 15rem;
 }
+
+th, td {
+    min-width: auto;
+    max-width: 250px;
+}
+
+.th-order-w-100, .td-order-w-100 {
+    max-width: 100px;
+}
+
+.truncated-text {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+	line-clamp: 2;
+    overflow: hidden;
+}
+
+.tooltip {
+    font-size: 14px;
+}
+
+.tooltip .tooltip-inner {
+   background-color: #343a40;
+   color: #fff;
+   border-radius: 0.25rem;
+   padding: 0.5rem 1rem;
+}
+
+.tooltip .arrow::before {
+   border-top-color: #343a40;
+}
+
+.notification {
+    z-index: 1056;
+}
