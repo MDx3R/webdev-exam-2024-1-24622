@@ -409,10 +409,10 @@ class AccountView extends OrderView {
             </td>`;
 
         let cell = document.createElement("td");
-        let contarinder = document.createElement("div");
-        contarinder.classList = "d-flex gap-1";
+        let contariner = document.createElement("div");
+        contariner.classList = "d-flex gap-1 justify-content-center";
 
-        cell.append(contarinder);
+        cell.append(contariner);
 
         let viewButton = document.createElement("button");
         viewButton.className = "btn btn-sm btn-outline-primary";
@@ -438,7 +438,7 @@ class AccountView extends OrderView {
             () => this.showOrderModal(order, "remove")
         );
 
-        contarinder.append(viewButton, editButton, removeButton);
+        contariner.append(viewButton, editButton, removeButton);
 
         row.append(cell);
 
