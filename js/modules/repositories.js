@@ -1,5 +1,6 @@
 import {
     listProducts,
+    listProductsByPage,
     retrieveProduct,
     listOrders,
     retrieveOrder,
@@ -16,6 +17,13 @@ class ProductRepository {
     constructor() {
         this.products = [];
         this.cart = []; // product ids 
+        this.current_page = 1;
+        this.per_page = 25;
+        this.total_count = 0;
+    }
+
+    getCart() {
+        this.cart = this.getProductsFromCart();
     }
 
     async getProducts() {
@@ -23,7 +31,30 @@ class ProductRepository {
             this.products.push(new Product(elem));
         }
         this.products = this.sortProducts("rating_desc");
-        this.cart = this.getProductsFromCart();
+    }
+
+    async getProductsByPage(page = null) {
+        if (page) {
+            this.current_page = page;
+            this.products = [];
+        }
+        const length = this.products.length;
+        const result = await listProductsByPage(
+            this.current_page, this.per_page
+        );
+
+        this.total_count = result["_pagination"]["total_count"];
+
+        for (let elem of result["goods"]) {
+            this.products.push(new Product(elem));
+        }
+        this.current_page++;
+
+        return length;
+    }
+
+    areProductsLeft() {
+        return this.products.length < this.total_count;
     }
 
     async getProduct(id) {
@@ -103,7 +134,13 @@ class OrderRepository {
 
     async getOrders() {
         for (let elem of await listOrders()) {
-            this.orders.push(new Order(elem));
+            let order = new Order(elem);
+            for (let product_id of order.good_ids) {
+                order.goods.push(
+                    new Product(await retrieveProduct(product_id))
+                );
+            }
+            this.orders.push(order);
         }
     }
 
@@ -115,12 +152,16 @@ class OrderRepository {
         return new Order(await postOrder(data));
     }
 
-    async updateOrder(order) {
-        return new Order(await putOrder(order));
+    async updateOrder(id, data) {
+        return new Order(await putOrder(id, data));
     }
 
     async removeOrder(id) {
         return new Order(await deleteOrder(id));
+    }
+
+    removeFromOrders(order) {
+        this.orders = this.orders.filter(a => a != order);
     }
 }
 
