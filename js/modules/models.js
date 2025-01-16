@@ -32,6 +32,8 @@ class Order {
         this.subscribe = json.subscribe;
         this.created_at = json.created_at;
         this.updated_at = json.updated_at;
+        this.goods = []; // после инициализации заполняется репозиторием
+        this.container = null;
     }
 }
 
